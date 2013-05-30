@@ -77,6 +77,8 @@ print_base32_digest(const unsigned char *digest, unsigned bits)
 		,'Y', 'Z', '2', '3', '4', '5', '6', '7'
 		};
 	unsigned i = print_lookup_digest(digest, bits, lookup, 5);
+	/* TODO: add tests (there are vectors in RFC4648). This is probably
+	 * wrong. */
 	while (i > 0) {
 		printf("=");
 		i--;
@@ -98,6 +100,8 @@ print_base64_digest(const unsigned char *digest, unsigned bits)
 		,'4', '5', '6', '7', '8', '9', '+', '/'
 		};
 	unsigned i = print_lookup_digest(digest, bits, lookup, 6) / 2;
+	/* TODO: add tests (there are vectors in RFC4648). This is probably
+	 * wrong. */
 	while (i > 0) {
 		printf("=");
 		i--;
@@ -438,6 +442,8 @@ main(int argc, char *argv[])
 	struct hash_step *steps;
 
 	if (argc < 3) {
+		/* FIXME: this is crap - come up with something else that makes a bit
+		 * more sense... and it should be able to read from stdin. */
 		printf("usage:\n");
 		printf("  %s\n"
 		       "     ( { [\"tree\", [\":\", block size], \".\"],\n"
