@@ -153,6 +153,7 @@ struct hash_step {
 	struct hash_s      hash;
 	int                tree_initialized;
 	digest_output_func output;
+	struct hash_step  *next;
 };
 
 static
@@ -297,7 +298,7 @@ static const char *parse_output_format(const char *s, struct hash_step *step)
 
 unsigned parse_merkle_spec(const char *s, struct hash_step *step)
 {
-	unsigned hash_size = 1024;
+	unsigned hash_size     = 1024;
 	step->tree_initialized = (strncmp(s, "tree", 4) == 0);
 	if (step->tree_initialized) {
 		s += 4;
@@ -346,83 +347,75 @@ unsigned parse_merkle_spec(const char *s, struct hash_step *step)
 	return (s) ? 0 : -1;
 }
 
-static void cleanup_step(struct hash_step *step)
+struct hash_step *str_to_spec(const char *s)
 {
-	if (step->tree_initialized)
-		step->tree.destroy(&step->tree);
-	step->hash.destroy(&step->hash);
+	struct hash_step *step = malloc(sizeof(struct hash_step));
+	if (!step) {
+		fprintf(stderr, "oom\n");
+		return NULL;
+	}
+	step->next = 0;
+	if (parse_merkle_spec(s, step)) {
+		free(step);
+		step = NULL;
+	}
+	return step;
 }
 
-static int open_and_process(const char *filename, struct hash_step *steps, unsigned nb_steps)
+static void process_file(FILE *f, struct hash_step *steps)
 {
-	FILE *f = fopen(filename, "rb");
 	unsigned char buffer[BUFFER_SIZE];
 	size_t read;
+	while ((read = fread(buffer, 1, sizeof(buffer), f))) {
+		struct hash_step *t;
+		for (t = steps; t != NULL; t = t->next) {
+			if (t->tree_initialized)
+				t->tree.process(&t->tree, buffer, read);
+			else
+				t->hash.process(&t->hash, buffer, read);
+		}
+	}
+}
+
+static int open_and_process(const char *filename, struct hash_step *steps)
+{
+	FILE *f = fopen(filename, "rb");
 	if (!f) {
 		fprintf(stderr, "could not open '%s'\n", filename);
 		return -1;
 	}
-	while ((read = fread(buffer, 1, sizeof(buffer), f))) {
-		unsigned i;
-		for (i = 0; i < nb_steps; i++) {
-			if (steps[i].tree_initialized)
-				steps[i].tree.process(&steps[i].tree, buffer, read);
-			else
-				steps[i].hash.process(&steps[i].hash, buffer, read);
-		}
-	}
+	process_file(f, steps);
 	fclose(f);
 	return 0;
 }
 
-void steps_free(struct hash_step *steps, unsigned nb_steps)
+void step_unlink(struct hash_step **n)
 {
-	while (nb_steps >= 1) {
-		nb_steps--;
-		cleanup_step(steps + nb_steps);
-	}
-	free(steps);
-}
-
-struct hash_step *steps_load(char *step_configs[], unsigned nb_steps)
-{
-	struct hash_step *steps = malloc(sizeof(*steps) * nb_steps);
-	unsigned i = 0;
-	int error = 0;
-
-	if (!steps) {
-		fprintf(stderr, "oom\n");
-		return NULL;
-	}
-
-	while (i < nb_steps) {
-		error = parse_merkle_spec(step_configs[i], steps + i);
-		if (error)
-			break;
-		i++;
-	}
-
-	if (!error)
-		return steps;
-
-	steps_free(steps, i);
-	return NULL;
+	struct hash_step *step;
+	assert(n);
+	step = *n;
+	assert(step);
+	if (step->tree_initialized)
+		step->tree.destroy(&step->tree);
+	step->hash.destroy(&step->hash);
+	*n = step->next;
+	free(step);
 }
 
 /* For all of the given steps, call the end method and print the digest in the
  * requested format. */
 static
 int
-steps_finish_and_print(struct hash_step *steps, unsigned nb_steps)
+steps_finish_and_print(struct hash_step *steps)
 {
-	unsigned i;
-	for (i = 0; i < nb_steps; i++) {
-		struct hash_s *h = (steps[i].tree_initialized) ? &steps[i].tree : &steps[i].hash;
+	struct hash_step *t;
+	for (t = steps; t != NULL; t = t->next) {
+		struct hash_s *h = (t->tree_initialized) ? &t->tree : &t->hash;
 		unsigned       dsize = h->query_digest_size(h);
 		unsigned char *digest = malloc((dsize + 7) / 8);
 		if (digest) {
 			h->end(h, digest);
-			steps[i].output(digest, dsize);
+			t->output(digest, dsize);
 			printf(" ");
 			free(digest);
 		} else {
@@ -437,21 +430,24 @@ steps_finish_and_print(struct hash_step *steps, unsigned nb_steps)
 int
 main(int argc, char *argv[])
 {
-	unsigned nb_steps;
-	int error;
-	struct hash_step *steps;
+	unsigned i = 1;
+	int error = 0;
+	struct hash_step *steps = NULL;
+	struct hash_step **insert_pos = &steps;
+	const char *filename = NULL;
 
-	if (argc < 3) {
+	if (argc < 2) {
 		/* FIXME: this is crap - come up with something else that makes a bit
 		 * more sense... and it should be able to read from stdin. */
 		printf("usage:\n");
 		printf("  %s\n"
-		       "     ( { [\"tree\", [\":\", block size], \".\"],\n"
+		       "     ( { [\"tree\", [\".\", block size], \":\"],\n"
 		       "         algorithm,\n"
-		       "         [\".\", format]\n"
-		       "       } (\"-\" | filename)\n"
-		       "     ) | ( \"--help\", [ algorithm ] )\n\n", argv[0]);
-		printf("Produces a set of hashes for a given input.\n\n");
+		       "         [\":\", format]\n"
+		       "       }\n"
+		       "     | ( \"-f\", filename )\n"
+		       "     )\n\n", argv[0]);
+		printf("Produces a set of hashes for data given through stdin or a file.\n\n");
 		printf("A set of (optional) specifiers are given followed by either a single hyphen\n");
 		printf("(signifying that input should be taken from stdin) or a filename. Each\n");
 		printf("specifier can consist of an optional 'tree' prefix indicating that the root\n");
@@ -464,20 +460,49 @@ main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	nb_steps = argc - 2;
-	steps = steps_load(argv + 1, nb_steps);
-	if (!steps)
-		exit(-2);
+	while ((i < argc) && !error) {
+		if (argv[i][0] == '-') {
+			switch (argv[i][1]) {
+			case 'f':
+				i++;
+				if (filename) {
+					fprintf(stderr, "filename already specified\n"); error = 1;
+				} else if (i >= argc) {
+					fprintf(stderr, "expected filename\n"); error = 1;
+				} else {
+					filename = argv[i];
+				}
+				break;
+			default:
+				fprintf(stderr, "unknown switch '%s'\n", &argv[i][1]); error = 1;
+				break;
+			}
+		} else {
+			*insert_pos = str_to_spec(argv[i]);
+			error = (*insert_pos == NULL);
+			insert_pos = &((*insert_pos)->next);
+		}
+		i++;
+	}
 
-	error = open_and_process(argv[argc-1], steps, nb_steps);
+	assert(steps);
+
+	if ((steps != NULL) && !error) {
+		if (filename) {
+			error = open_and_process(filename, steps);
+		} else {
+			process_file(stdin, steps);
+		}
+	}
 
 	if (!error)
-		error = steps_finish_and_print(steps, nb_steps);
+		error = steps_finish_and_print(steps);
 
-	/* Free up steps */
-	steps_free(steps, nb_steps);
+	while (steps)
+		step_unlink(&steps);
 
 	exit(error);
+
 }
 
 
