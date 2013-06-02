@@ -31,10 +31,12 @@ extern struct unittest sha1_tests;
 extern struct unittest tiger_tests;
 extern struct unittest tigertree_tests;
 extern struct unittest sha2_512_tests;
+extern struct unittest md4_tests;
 extern struct unittest md5_tests;
 
 const struct unittest *sub_tests[] =
-{	&md5_tests
+{	&md4_tests
+,	&md5_tests
 ,	&sha1_tests
 ,	&sha2_512_tests
 ,	&tiger_tests

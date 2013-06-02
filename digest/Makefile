@@ -9,6 +9,7 @@ SRCS     = \
 ../hash/src/tiger_internal.c \
 ../hash/src/tiger.c \
 ../hash/src/hashtree.c \
+../hash/src/md4.c \
 ../hash/src/md5.c
 
 ifeq (${MAKECMDGOALS},check)
@@ -18,6 +19,7 @@ SRCS += \
 ../unittest/src/unittest_main.c \
 ../hash/tests/simple_hash_test.c \
 ../hash/tests/hash_tests.c \
+../hash/tests/md4_test.c \
 ../hash/tests/md5_test.c \
 ../hash/tests/sha1_test.c \
 ../hash/tests/sha2_512_test.c \

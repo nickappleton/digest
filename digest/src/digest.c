@@ -33,6 +33,7 @@
 #include "hash/hash.h"
 #include "hash/tiger.h"
 #include "hash/sha1.h"
+#include "hash/md4.h"
 #include "hash/md5.h"
 #include "hash/hashtree.h"
 
@@ -201,6 +202,21 @@ md5_setup(struct hash_step *step, const char *cfg_str)
 	return 0;
 }
 
+static
+int
+md4_setup(struct hash_step *step, const char *cfg_str)
+{
+	if (cfg_str) {
+		fprintf(stderr, "cannot configure MD4 with '%s'\n", cfg_str);
+		return -1;
+	}
+	if (md4_create(&step->hash)) {
+		fprintf(stderr, "could not create MD4 hash object\n");
+		return -2;
+	}
+	return 0;
+}
+
 typedef int (*hash_cfg_func)(struct hash_step *step, const char *cfg_str);
 
 struct hash_alg {
@@ -220,6 +236,7 @@ find_hashalg(const char *s, const struct hash_alg **alg)
 	static const struct hash_alg supported[] =
 	{	{"tiger", tiger_setup}
 	,	{"sha1", sha1_setup}
+	,	{"md4", md4_setup}
 	,	{"md5", md5_setup}
 	};
 
