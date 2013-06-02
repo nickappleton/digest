@@ -224,6 +224,13 @@ struct hash_alg {
 	hash_cfg_func  setup;
 };
 
+static const struct hash_alg supported[] =
+{	{"tiger", tiger_setup}
+,	{"sha1", sha1_setup}
+,	{"md4", md4_setup}
+,	{"md5", md5_setup}
+};
+
 /* Searches the given string until the next separator ('.' or ':') or the end
  * of string is encountered for a matching supported hash algorithm. Returns
  * the position the scan finished on success. Returns NULL on fail. */
@@ -233,13 +240,6 @@ find_hashalg(const char *s, const struct hash_alg **alg)
 {
 	unsigned l = 0;
 	unsigned i;
-	static const struct hash_alg supported[] =
-	{	{"tiger", tiger_setup}
-	,	{"sha1", sha1_setup}
-	,	{"md4", md4_setup}
-	,	{"md5", md5_setup}
-	};
-
 	while ((s[l] != ':') && (s[l] != '.') && (s[l] != '\0'))
 		l++;
 
@@ -454,26 +454,38 @@ main(int argc, char *argv[])
 	const char *filename = NULL;
 
 	if (argc < 2) {
+		unsigned j;
 		/* FIXME: this is crap - come up with something else that makes a bit
 		 * more sense... and it should be able to read from stdin. */
 		printf("usage:\n");
 		printf("  %s\n"
 		       "     ( { [\"tree\", [\".\", block size], \":\"],\n"
 		       "         algorithm,\n"
-		       "         [\":\", format]\n"
+		       "         [\":\", format [\".\", parameter ] ]\n"
 		       "       }\n"
 		       "     | ( \"-f\", filename )\n"
 		       "     )\n\n", argv[0]);
 		printf("Produces a set of hashes for data given through stdin or a file.\n\n");
-		printf("A set of (optional) specifiers are given followed by either a single hyphen\n");
-		printf("(signifying that input should be taken from stdin) or a filename. Each\n");
-		printf("specifier can consist of an optional 'tree' prefix indicating that the root\n");
-		printf("hash of a merkle tree should be used as the output. The tree prefix can take\n");
-		printf("an optional integer argument (specified following a colon) to specify the block\n");
-		printf("size. If the argument is not specified, it will default to 1024.\n\n");
-		printf("The algorithm parameter specifies the name of the hash algorithm.\n\n");
-		printf("The optional format specifier can be used to specify the display format of the\n");
-		printf("output. If it is not given, it will default to hex.\n");
+		printf("The optional 'tree' prefix indicates that the root hash of a merkle tree\n");
+		printf("should be used as the output. The tree prefix can take an optional integer\n");
+		printf("argument (specified following a period) to specify the block size. If the\n");
+		printf("argument is not specified, it will default to 1024.\n\n");
+		printf("The algorithm parameter specifies the name of a supported hash algorithm:\n    ");
+		for (j = 0; j < (sizeof(supported) / sizeof(supported[0])); j++) {
+			printf("%s", supported[j].name);
+			if (j + 1 < (sizeof(supported) / sizeof(supported[0])))
+				printf(", ");
+		}
+		printf("\n\n");
+		printf("The optional format specifier suffix can be used to specify the display format\n");
+		printf("of the output. If it is not specified, it will default to hex. Supported\n");
+		printf("values are:\n    ");
+		for (j = 0; j < (sizeof(output_formats) / sizeof(output_formats[0])); j++) {
+			printf("%s", output_formats[j].name);
+			if (j + 1 < (sizeof(output_formats) / sizeof(output_formats[0])))
+				printf(", ");
+		}
+		printf("\n\n");
 		exit(-1);
 	}
 
