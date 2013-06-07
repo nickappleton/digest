@@ -104,26 +104,55 @@ void run_simple_sha2_512(struct unittest_manager *manager, const void *parameter
 	sha1.destroy(&sha1);
 }
 
-static const struct unittest sha2_512_internal_tests[] =
+static const struct unittest sha2_512_512_internal_tests[] =
 {	{"test1", NULL, run_simple_sha2_512, &sha2_512_test_data[0], NULL}
 ,	{"test2", NULL, run_simple_sha2_512, &sha2_512_test_data[1], NULL}
 ,	{"test3", NULL, run_simple_sha2_512, &sha2_512_test_data[2], NULL}
 ,	{"test4", NULL, run_simple_sha2_512, &sha2_512_test_data[3], NULL}
-,	{"test5", NULL, run_simple_sha2_512, &sha2_512_test_data[4], NULL}
-,	{"test6", NULL, run_simple_sha2_512, &sha2_512_test_data[5], NULL}
-,	{"test7", NULL, run_simple_sha2_512, &sha2_512_test_data[6], NULL}
-,	{"test8", NULL, run_simple_sha2_512, &sha2_512_test_data[7], NULL}
+};
+
+static const struct unittest *sha2_512_512_subtests[] =
+{	&sha2_512_512_internal_tests[0]
+,	&sha2_512_512_internal_tests[1]
+,	&sha2_512_512_internal_tests[2]
+,	&sha2_512_512_internal_tests[3]
+,	NULL
+};
+
+const struct unittest sha2_512_512_tests =
+{	"512-bit"
+,	"SHA-2-512 512 bit digest tests"
+,	NULL
+,	NULL
+,	sha2_512_512_subtests
+};
+
+static const struct unittest sha2_512_384_internal_tests[] =
+{	{"test1", NULL, run_simple_sha2_512, &sha2_512_test_data[4], NULL}
+,	{"test2", NULL, run_simple_sha2_512, &sha2_512_test_data[5], NULL}
+,	{"test3", NULL, run_simple_sha2_512, &sha2_512_test_data[6], NULL}
+,	{"test4", NULL, run_simple_sha2_512, &sha2_512_test_data[7], NULL}
+};
+
+static const struct unittest *sha2_512_384_subtests[] =
+{	&sha2_512_384_internal_tests[0]
+,	&sha2_512_384_internal_tests[1]
+,	&sha2_512_384_internal_tests[2]
+,	&sha2_512_384_internal_tests[3]
+,	NULL
+};
+
+const struct unittest sha2_512_384_tests =
+{	"384-bit"
+,	"SHA-2-512 384 bit digest tests"
+,	NULL
+,	NULL
+,	sha2_512_384_subtests
 };
 
 static const struct unittest *sha2_512_subtests[] =
-{	&sha2_512_internal_tests[0]
-,	&sha2_512_internal_tests[1]
-,	&sha2_512_internal_tests[2]
-,	&sha2_512_internal_tests[3]
-,	&sha2_512_internal_tests[4]
-,	&sha2_512_internal_tests[5]
-,	&sha2_512_internal_tests[6]
-,	&sha2_512_internal_tests[7]
+{	&sha2_512_384_tests
+,	&sha2_512_512_tests
 ,	NULL
 };
 
