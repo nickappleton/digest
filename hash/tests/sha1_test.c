@@ -98,7 +98,7 @@ static const struct unittest *sha1_subtests[] =
 ,	NULL
 };
 
-struct unittest sha1_tests =
+const struct unittest sha1_tests =
 {	"sha1"
 ,	"SHA-1 Tests"
 ,	NULL

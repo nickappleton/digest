@@ -127,8 +127,8 @@ static const struct unittest *sha2_512_subtests[] =
 ,	NULL
 };
 
-struct unittest sha2_512_tests =
-{	"sha2-512-512"
+const struct unittest sha2_512_tests =
+{	"sha2-512"
 ,	"SHA-2-512 tests"
 ,	NULL
 ,	NULL

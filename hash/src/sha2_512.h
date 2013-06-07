@@ -24,8 +24,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE. */
 
-#ifndef SHA2_H_
-#define SHA2_H_
+#ifndef SHA2_512_H_
+#define SHA2_512_H_
 
 #include "hash/hash.h"
 

@@ -143,7 +143,7 @@ static const struct unittest *tiger_subtests[] =
 ,	NULL
 };
 
-struct unittest tiger_tests =
+const struct unittest tiger_tests =
 {	"tiger"
 ,	"tiger tests"
 ,	NULL

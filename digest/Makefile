@@ -4,6 +4,7 @@ DEBUG        := 0
 # Source filenames
 SRCS     = \
 ../hash/src/sha1.c \
+../hash/src/sha2_256.c \
 ../hash/src/sha2_512.c \
 ../hash/src/tiger_coefs.c \
 ../hash/src/tiger_internal.c \
@@ -22,6 +23,7 @@ SRCS += \
 ../hash/tests/md4_test.c \
 ../hash/tests/md5_test.c \
 ../hash/tests/sha1_test.c \
+../hash/tests/sha2_256_test.c \
 ../hash/tests/sha2_512_test.c \
 ../hash/tests/tiger_test.c \
 ../hash/tests/tigertree_test.c

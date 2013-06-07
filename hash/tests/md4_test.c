@@ -101,7 +101,7 @@ static const struct unittest *md4_subtests[] =
 ,	NULL
 };
 
-struct unittest md4_tests =
+const struct unittest md4_tests =
 {	"md4"
 ,	"MD4 Tests"
 ,	NULL

@@ -124,7 +124,7 @@ static const struct unittest *tigertree_subtests[] =
 ,	NULL
 };
 
-struct unittest tigertree_tests =
+const struct unittest tigertree_tests =
 {	"tigertree"
 ,	"tigertree tests"
 ,	NULL

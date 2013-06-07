@@ -24,34 +24,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE. */
 
-#include "hash/hash_tests.h"
-#include <stdio.h>
+#ifndef SHA2_256_H_
+#define SHA2_256_H_
 
-extern const struct unittest sha1_tests;
-extern const struct unittest tiger_tests;
-extern const struct unittest tigertree_tests;
-extern const struct unittest sha2_256_tests;
-extern const struct unittest sha2_512_tests;
-extern const struct unittest md4_tests;
-extern const struct unittest md5_tests;
+#include "hash/hash.h"
 
-const struct unittest *sub_tests[] =
-{	&md4_tests
-,	&md5_tests
-,	&sha1_tests
-,	&sha2_256_tests
-,	&sha2_512_tests
-,	&tiger_tests
-,	&tigertree_tests
-,	NULL
-};
+int sha2_256_create(struct hash_s *hash, unsigned digest_bits);
 
-const struct unittest hash_tests =
-{	"hash"
-,	"Hash test set"
-,	NULL
-,	NULL
-,	sub_tests
-};
-
-
+#endif /* SHA2_256_H_ */

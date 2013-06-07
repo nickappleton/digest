@@ -109,7 +109,7 @@ static const UINT64 sha512_table[80] =
 #define SHA_Ch(x,y,z)        UINT64_XOR(UINT64_AND(x, y), UINT64_AND(UINT64_COMP(x), z))
 #define SHA_Maj(x,y,z)       UINT64_XOR(UINT64_XOR(UINT64_AND(x, y), UINT64_AND(x, z)), UINT64_AND(y, z))
 
-void process_block(UINT64 *state, const unsigned char *words)
+static void process_block(UINT64 *state, const unsigned char *words)
 {
 	UINT64 work[80];
 	UINT64 h[8];
@@ -146,13 +146,14 @@ void process_block(UINT64 *state, const unsigned char *words)
 }
 
 struct hash_pvt_s {
-	UINT64        ivt[8];
 	const UINT64 *initial;
 	unsigned      digest_bits;
 	UINT64        hash[8];
 	UINT64        length;
 	unsigned      buffer_index;
 	unsigned char buffer_data[128];
+	/* Storage for the arbitrary bit length initial vector */
+	UINT64        ivt[8];
 };
 
 static
