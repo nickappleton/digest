@@ -25,8 +25,6 @@ SRCS += \
 ../hash/tests/md5_test.c \
 ../hash/tests/sha1_test.c \
 ../hash/tests/sha2_test.c \
-../hash/tests/sha2_256_test.c \
-../hash/tests/sha2_512_test.c \
 ../hash/tests/tiger_test.c \
 ../hash/tests/tigertree_test.c
 else

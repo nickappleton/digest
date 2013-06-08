@@ -31,8 +31,6 @@ extern const struct unittest sha1_tests;
 extern const struct unittest tiger_tests;
 extern const struct unittest tigertree_tests;
 extern const struct unittest sha2_tests;
-extern const struct unittest sha2_256_tests;
-extern const struct unittest sha2_512_tests;
 extern const struct unittest md4_tests;
 extern const struct unittest md5_tests;
 
@@ -41,8 +39,6 @@ const struct unittest *sub_tests[] =
 ,	&md5_tests
 ,	&sha1_tests
 ,	&sha2_tests
-,	&sha2_256_tests
-,	&sha2_512_tests
 ,	&tiger_tests
 ,	&tigertree_tests
 ,	NULL
