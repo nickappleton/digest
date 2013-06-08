@@ -224,11 +224,25 @@ static
 int
 sha3_setup(struct hash_step *step, const char *cfg_str)
 {
+	unsigned digest_size = 512;
 	if (cfg_str) {
-		fprintf(stderr, "cannot configure SHA3 with '%s'\n", cfg_str);
-		return -1;
+		const char *c = parse_unsigned(cfg_str, &digest_size);
+		if ((c == NULL) || (*c != '\0')) {
+			fprintf(stderr, "cannot configure SHA3 with '%s'\n", cfg_str);
+			return -1;
+		}
+		switch (digest_size) {
+		case 224:
+		case 256:
+		case 384:
+		case 512:
+			break;
+		default:
+			fprintf(stderr, "%u is an unsupported digest size for SHA-3\n", digest_size);
+			return -3;
+		}
 	}
-	if (sha3_create(&step->hash, 512)) {
+	if (sha3_create(&step->hash, digest_size)) {
 		fprintf(stderr, "could not create SHA3 hash object\n");
 		return -2;
 	}
@@ -509,9 +523,9 @@ main(int argc, char *argv[])
 		 * more sense... and it should be able to read from stdin. */
 		printf("usage:\n");
 		printf("  %s\n"
-		       "     ( { [\"tree\", [\".\", block size], \":\"],\n"
-		       "         algorithm,\n"
-		       "         [\":\", format [\".\", parameter ] ]\n"
+		       "     ( { [ \"tree\", [\".\", block size], \":\" ],\n"
+		       "         ( \"algorithm\", [\".\", algorithm specific parameters ] ),\n"
+		       "         [ \":\", format [\".\", parameter ] ]\n"
 		       "       }\n"
 		       "     | ( \"-f\", filename )\n"
 		       "     )\n\n", argv[0]);
