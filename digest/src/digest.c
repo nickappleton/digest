@@ -284,15 +284,37 @@ typedef int (*hash_cfg_func)(struct hash_step *step, const char *cfg_str);
 struct hash_alg {
 	const char    *name;
 	hash_cfg_func  setup;
+	void         (*show_help)(const struct hash_alg *alg);
 };
 
+static void generic_hash_help(const struct hash_alg *alg)
+{
+	printf("Computes the %s hash of the stream. The algorithm has no additional arguments.\n\n", alg->name);
+}
+
+static void sha2_help(const struct hash_alg *alg)
+{
+	printf("Computes the %s hash of the stream.\n\n", alg->name);
+	printf("algorithm specific parameters = [ digest size, [\".\", force 512 bit ] ]\n\n");
+	printf("Supported digest sizes are between 1 and 512 bits. The force 512 bit option\n");
+	printf("causes the algorithm to always be computed using the SHA-2 512 operation.\n\n");
+	printf("Example configurations are:\n");
+	printf("    |   digest_bits   | force_512 |  NIST SHA-2  |\n");
+	printf("    | 224             | 0         | SHA-224      |\n");
+	printf("    | 224             | 1         | SHA-512/224  |\n");
+	printf("    | 256             | 0         | SHA-256      |\n");
+	printf("    | 256             | 1         | SHA-512/256  |\n");
+	printf("    | 384             | X         | SHA-384      |\n");
+	printf("    | 512             | X         | SHA-512      |\n");
+}
+
 static const struct hash_alg supported[] =
-{	{"tiger", tiger_setup}
-,	{"sha1", sha1_setup}
-,	{"sha2", sha2_setup}
-,	{"sha3", sha3_setup}
-,	{"md4", md4_setup}
-,	{"md5", md5_setup}
+{	{"tiger", tiger_setup, generic_hash_help}
+,	{"sha1", sha1_setup, generic_hash_help}
+,	{"sha2", sha2_setup, sha2_help}
+,	{"sha3", sha3_setup, generic_hash_help}
+,	{"md4", md4_setup, generic_hash_help}
+,	{"md5", md5_setup, generic_hash_help}
 };
 
 /* Searches the given string until the next separator ('.' or ':') or the end
@@ -511,23 +533,27 @@ steps_finish_and_print(struct hash_step *steps)
 int
 main(int argc, char *argv[])
 {
-	unsigned i = 1;
+	unsigned i;
 	int error = 0;
+	int help = (argc > 1) && (strcmp(argv[1], "help") == 0);
+	const char *help_arg = ((argc > 2) && help) ? argv[2] : NULL;
 	struct hash_step *steps = NULL;
 	struct hash_step **insert_pos = &steps;
 	const char *filename = NULL;
 
-	if (argc < 2) {
+	if ((argc < 2) || (help && (help_arg == NULL))) {
 		unsigned j;
 		/* FIXME: this is crap - come up with something else that makes a bit
 		 * more sense... and it should be able to read from stdin. */
 		printf("usage:\n");
 		printf("  %s\n"
-		       "     ( { [ \"tree\", [\".\", block size], \":\" ],\n"
-		       "         ( \"algorithm\", [\".\", algorithm specific parameters ] ),\n"
-		       "         [ \":\", format [\".\", parameter ] ]\n"
-		       "       }\n"
-		       "     | ( \"-f\", filename )\n"
+		       "     ( ( { [ \"tree\", [\".\", block size], \":\" ],\n"
+		       "           ( algorithm name, [\".\", algorithm specific parameters ] ),\n"
+		       "           [ \":\", format name, [\".\", parameter ] ]\n"
+		       "         }\n"
+		       "       , [ \"-f\", filename ]\n"
+		       "       )\n"
+		       "     | ( \"help\", [ algorithm name | format name ] )\n"
 		       "     )\n\n", argv[0]);
 		printf("Produces a set of hashes for data given through stdin or a file.\n\n");
 		printf("The optional 'tree' prefix indicates that the root hash of a merkle tree\n");
@@ -553,6 +579,22 @@ main(int argc, char *argv[])
 		exit(-1);
 	}
 
+	if (help) {
+		if (help_arg == NULL)
+			exit(0);
+		for (i = 0; i < (sizeof(supported) / sizeof(supported[0])); i++)
+			if (strcmp(supported[i].name, help_arg) == 0) {
+				printf("%s algorithm\n", supported[i].name);
+				supported[i].show_help(supported + i);
+				exit(0);
+			}
+
+
+		printf("No help for '%s'\n", help_arg);
+		exit(-0);
+	}
+
+	i = 1;
 	while ((i < argc) && !error) {
 		if (argv[i][0] == '-') {
 			switch (argv[i][1]) {
