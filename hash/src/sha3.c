@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static void theta(UINT64 *A)
+static void theta(UINT64 *B, const UINT64 *A)
 {
 	unsigned x, y;
 	UINT64 C[5], D[5];
@@ -50,10 +50,10 @@ static void theta(UINT64 *A)
 
 	for (y = 0; y < 5; y++)
 		for (x = 0; x < 5; x++)
-			A[x + 5*y] = UINT64_XOR(A[x + 5*y], D[x]);
+			B[x + 5*y] = UINT64_XOR(A[x + 5*y], D[x]);
 }
 
-static void rho(UINT64 *A)
+static void rho(UINT64 *B, const UINT64 *A)
 {
 	static const unsigned offsets[25] =
 	{	0,  1,  62, 28, 27
@@ -62,9 +62,10 @@ static void rho(UINT64 *A)
 	,	41, 45, 15, 21, 8
 	,	18, 2,  61, 56, 14
 	};
-	unsigned x;
-	for (x = 0; x < 25; x++)
-		A[x] = UINT64_ROL(A[x], offsets[x]);
+	unsigned x, y;
+	for (y = 0; y < 5; y++)
+		for (x = 0; x < 5; x++)
+			B[x + 5*y] = UINT64_ROL(A[x + 5*y], offsets[x + 5*y]);
 }
 
 static void pi(UINT64 *out, const UINT64 *in)
@@ -76,9 +77,11 @@ static void pi(UINT64 *out, const UINT64 *in)
 	,	23, 8,  18, 3,  13
 	,	14, 24, 9,  19, 4
 	};
-	unsigned int x;
-	for (x = 0; x < 25; x++)
-		out[offsets[x]] = in[x];
+
+	unsigned int x, y;
+	for (y = 0; y < 5; y++)
+		for (x = 0; x < 5; x++)
+			out[offsets[x + 5*y]] = in[x + 5*y];
 }
 
 static void chi(UINT64 *out, const UINT64 *in)
@@ -139,8 +142,8 @@ static void sha3_absorb(UINT64 *state, const unsigned char *data, size_t size)
 	for (i = 0; i < elements; i++)
 		state[i] = UINT64_XOR(state[i], buf[i]);
 	for (i = 0; i < 24; i++) {
-		theta(state);
-		rho(state);
+		theta(buf, state);
+		rho(state, buf);
 		pi(buf, state);
 		chi(state, buf);
 		iota(state, i);
