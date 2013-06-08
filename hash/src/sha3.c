@@ -62,18 +62,23 @@ static void rho(UINT64 *A)
 	,	41, 45, 15, 21, 8
 	,	18, 2,  61, 56, 14
 	};
-	unsigned x, y;
-	for (y = 0; y < 5; y++)
-		for (x = 0; x < 5; x++)
-			A[x + 5*y] = UINT64_ROL(A[x + 5*y], offsets[x + 5*y]);
+	unsigned x;
+	for (x = 0; x < 25; x++)
+		A[x] = UINT64_ROL(A[x], offsets[x]);
 }
 
 static void pi(UINT64 *out, const UINT64 *in)
 {
-	unsigned int x, y;
-	for (y = 0; y < 5; y++)
-		for (x = 0; x < 5; x++)
-			out[y + 5*((2*x + 3*y)%5)] = in[x + 5*y];
+	static const unsigned offsets[25] =
+	{	0,  10, 20, 5,  15
+	,	16, 1,  11, 21, 6
+	,	7,  17, 2,  12, 22
+	,	23, 8,  18, 3,  13
+	,	14, 24, 9,  19, 4
+	};
+	unsigned int x;
+	for (x = 0; x < 25; x++)
+		out[offsets[x]] = in[x];
 }
 
 static void chi(UINT64 *out, const UINT64 *in)
