@@ -33,6 +33,7 @@
 #include "hash/hash.h"
 #include "hash/tiger.h"
 #include "hash/sha1.h"
+#include "hash/sha2.h"
 #include "hash/md4.h"
 #include "hash/md5.h"
 #include "hash/hashtree.h"
@@ -189,6 +190,37 @@ sha1_setup(struct hash_step *step, const char *cfg_str)
 
 static
 int
+sha2_setup(struct hash_step *step, const char *cfg_str)
+{
+	unsigned digest_size = 512;
+	unsigned force_512 = 0;
+	if (cfg_str) {
+		const char *c = parse_unsigned(cfg_str, &digest_size);
+		if ((c == NULL) || ((*c != '.') && (*c != '\0'))) {
+			fprintf(stderr, "cannot configure SHA2 with '%s'\n", cfg_str);
+			return -1;
+		}
+		if ((digest_size < 1) || (digest_size > 512)) {
+			fprintf(stderr, "digest size must be between 1 and 512 bits\n");
+			return -1;
+		}
+		if (*c == '.') {
+			c = parse_unsigned(c + 1, &force_512);
+			if ((c == NULL) || (*c != '\0')) {
+				fprintf(stderr, "cannot configure SHA2 with '%s'\n", cfg_str);
+				return -1;
+			}
+		}
+	}
+	if (sha2_create(&step->hash, digest_size, (force_512 != 0))) {
+		fprintf(stderr, "could not create SHA2 hash object (digest_size=%u,force_512=%d)\n", digest_size, (force_512 != 0));
+		return -2;
+	}
+	return 0;
+}
+
+static
+int
 md5_setup(struct hash_step *step, const char *cfg_str)
 {
 	if (cfg_str) {
@@ -227,6 +259,7 @@ struct hash_alg {
 static const struct hash_alg supported[] =
 {	{"tiger", tiger_setup}
 ,	{"sha1", sha1_setup}
+,	{"sha2", sha2_setup}
 ,	{"md4", md4_setup}
 ,	{"md5", md5_setup}
 };
