@@ -79,7 +79,7 @@ static const mccl_uif32 sha256_table[64] =
 #define SSIG0(x)     (ROR32(x, 7) ^  ROR32(x, 18) ^ ((x) >> 3))
 #define SSIG1(x)     (ROR32(x, 17) ^ ROR32(x, 19) ^ ((x) >> 10))
 
-static void process_block(mccl_uif32 *state, const unsigned char *words)
+void sha2_256_process_block(mccl_uif32 *state, const unsigned char *words)
 {
 	mccl_uif32 work[64];
 	mccl_uif32 a = state[0];
@@ -158,14 +158,14 @@ sha2_256_process(struct hash_s *hash, const unsigned char *data, size_t size)
 		data += cpy;
 		hash->state->buffer_index += cpy;
 		if (hash->state->buffer_index == 64) {
-			process_block(hash->state->hash, hash->state->buffer_data);
+			sha2_256_process_block(hash->state->hash, hash->state->buffer_data);
 			context->length = UINT64_ADD(context->length, incr);
 			assert(UINT64_HIGH(context->length) || UINT64_LOW(context->length));
 			hash->state->buffer_index = 0;
 		}
 	}
 	while (size >= 64) {
-		process_block(hash->state->hash, data);
+		sha2_256_process_block(hash->state->hash, data);
 		context->length = UINT64_ADD(context->length, incr);
 		assert(UINT64_HIGH(context->length) || UINT64_LOW(context->length));
 		data += 64;
@@ -197,7 +197,7 @@ sha2_256_end(struct hash_s *hash, unsigned char *result)
 	if (context->buffer_index > 48) {
 		while (context->buffer_index < 64)
 			context->buffer_data[context->buffer_index++] = 0;
-		process_block(context->hash, context->buffer_data);
+		sha2_256_process_block(context->hash, context->buffer_data);
 		context->buffer_index = 0;
 	}
 
@@ -210,7 +210,7 @@ sha2_256_end(struct hash_s *hash, unsigned char *result)
 		context->length = UINT64_SHR(context->length, 8);
 	}
 
-	process_block(context->hash, context->buffer_data);
+	sha2_256_process_block(context->hash, context->buffer_data);
 	for (i = 0; i < hash->state->digest_bits / 8; i++)
 		result[i] = (unsigned char)((context->hash[i/4] >> (8u * (3u - (i & 0x03u)))) & 0xFFu);
 }

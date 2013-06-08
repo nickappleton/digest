@@ -28,6 +28,9 @@
 #define SHA2_512_H_
 
 #include "hash/hash.h"
+#include "mccl/mccl_op_uint64.h"
+
+void sha2_512_process_block(UINT64 *state, const unsigned char *words);
 
 int sha2_512_create(struct hash_s *hash, unsigned digest_bits);
 

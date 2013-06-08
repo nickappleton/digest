@@ -24,36 +24,26 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE. */
 
-#include "hash/hash_tests.h"
-#include <stdio.h>
+#ifndef SHA2_H_
+#define SHA2_H_
 
-extern const struct unittest sha1_tests;
-extern const struct unittest tiger_tests;
-extern const struct unittest tigertree_tests;
-extern const struct unittest sha2_tests;
-extern const struct unittest sha2_256_tests;
-extern const struct unittest sha2_512_tests;
-extern const struct unittest md4_tests;
-extern const struct unittest md5_tests;
+#include "hash.h"
 
-const struct unittest *sub_tests[] =
-{	&md4_tests
-,	&md5_tests
-,	&sha1_tests
-,	&sha2_tests
-,	&sha2_256_tests
-,	&sha2_512_tests
-,	&tiger_tests
-,	&tigertree_tests
-,	NULL
-};
+/* Creates a SHA-2 context with the length specified by digest_bits. The value
+ * of digest_bits can be anywhere from 1 to 512. Values outside this range
+ * produce undefined results.
+ *
+ * |   digest_bits   | force_512 |  NIST SHA-2  |
+ * | 224             | 0         | SHA-224      |
+ * | 224             | 1         | SHA-512/224  |
+ * | 256             | 0         | SHA-256      |
+ * | 256             | 1         | SHA-512/256  |
+ * | 384             | X         | SHA-384      |
+ * | 512             | X         | SHA-512      |
+ *
+ * For all other values of digest bits, the value of force_512 is ignored and
+ * the resulting digest will be computed as per SHA-512/t as proposed here:
+ *   http://eprint.iacr.org/2010/548.pdf */
+int sha2_create(struct hash_s *hash, unsigned digest_bits, int force_512);
 
-const struct unittest hash_tests =
-{	"hash"
-,	"Hash test set"
-,	NULL
-,	NULL
-,	sub_tests
-};
-
-
+#endif /* SHA2_H_ */

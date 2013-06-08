@@ -109,7 +109,7 @@ static const UINT64 sha512_table[80] =
 #define SHA_Ch(x,y,z)        UINT64_XOR(UINT64_AND(x, y), UINT64_AND(UINT64_COMP(x), z))
 #define SHA_Maj(x,y,z)       UINT64_XOR(UINT64_XOR(UINT64_AND(x, y), UINT64_AND(x, z)), UINT64_AND(y, z))
 
-static void process_block(UINT64 *state, const unsigned char *words)
+void sha2_512_process_block(UINT64 *state, const unsigned char *words)
 {
 	UINT64 work[80];
 	UINT64 h[8];
@@ -185,14 +185,14 @@ sha2_512_process(struct hash_s *hash, const unsigned char *data, size_t size)
 		data += cpy;
 		hash->state->buffer_index += cpy;
 		if (hash->state->buffer_index == 128) {
-			process_block(hash->state->hash, hash->state->buffer_data);
+			sha2_512_process_block(hash->state->hash, hash->state->buffer_data);
 			context->length = UINT64_ADD(context->length, incr);
 			assert(UINT64_HIGH(context->length) || UINT64_LOW(context->length));
 			hash->state->buffer_index = 0;
 		}
 	}
 	while (size >= 128) {
-		process_block(hash->state->hash, data);
+		sha2_512_process_block(hash->state->hash, data);
 		context->length = UINT64_ADD(context->length, incr);
 		assert(UINT64_HIGH(context->length) || UINT64_LOW(context->length));
 		data += 128;
@@ -224,7 +224,7 @@ sha2_512_end(struct hash_s *hash, unsigned char *result)
 	if (context->buffer_index > 112) {
 		while (context->buffer_index < 128)
 			context->buffer_data[context->buffer_index++] = 0;
-		process_block(context->hash, context->buffer_data);
+		sha2_512_process_block(context->hash, context->buffer_data);
 		context->buffer_index = 0;
 	}
 
@@ -237,7 +237,7 @@ sha2_512_end(struct hash_s *hash, unsigned char *result)
 		context->length = UINT64_SHR(context->length, 8);
 	}
 
-	process_block(context->hash, context->buffer_data);
+	sha2_512_process_block(context->hash, context->buffer_data);
 	for (i = 0; i < hash->state->digest_bits / 8; i++)
 		result[i] = (unsigned char)(UINT64_LOW(UINT64_SHR(context->hash[i/8], 8u * (7u - (i & 0x07u)))) & 0xFFu);
 }
