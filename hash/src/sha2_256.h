@@ -31,8 +31,4 @@
 
 void sha2_256_process_block(mccl_uif32 *state, const unsigned char *words);
 
-#include "hash/hash.h"
-
-int sha2_256_create(struct hash_s *hash, unsigned digest_bits);
-
 #endif /* SHA2_256_H_ */

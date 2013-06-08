@@ -27,13 +27,14 @@
 /* This work is based on:
  * http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
 
+#include "hash/sha2.h"
+#include "mccl/mccl_op_uint64.h"
+#include "mccl/mccl_bufcvt.h"
 #include "sha2_512.h"
 #include "sha2_256.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "mccl/mccl_op_uint64.h"
-#include "mccl/mccl_bufcvt.h"
 
 static const UINT64 sha512_224_initial[8] =
 {	UINT64_INIT(0x8C3D37C8u, 0x19544DA2u), UINT64_INIT(0x73E19966u, 0x89DCD4D6u)
