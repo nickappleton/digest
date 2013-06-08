@@ -196,4 +196,8 @@ typedef mccl_uif64 UINT64;
 #define UINT64_ROR(a, b) UINT64_OR(UINT64_SHR(a, (b) & 63u), UINT64_SHL(a, (64u - (b)) & 63u))
 #endif
 
+#ifndef UINT64_ROL
+#define UINT64_ROL(a, b) UINT64_OR(UINT64_SHL(a, (b) & 63u), UINT64_SHR(a, (64u - (b)) & 63u))
+#endif
+
 #endif /* OP_UINT64_H_ */

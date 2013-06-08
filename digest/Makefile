@@ -7,6 +7,7 @@ SRCS     = \
 ../hash/src/sha2.c \
 ../hash/src/sha2_256.c \
 ../hash/src/sha2_512.c \
+../hash/src/sha3.c \
 ../hash/src/tiger_coefs.c \
 ../hash/src/tiger_internal.c \
 ../hash/src/tiger.c \
@@ -25,6 +26,7 @@ SRCS += \
 ../hash/tests/md5_test.c \
 ../hash/tests/sha1_test.c \
 ../hash/tests/sha2_test.c \
+../hash/tests/sha3_test.c \
 ../hash/tests/tiger_test.c \
 ../hash/tests/tigertree_test.c
 else
