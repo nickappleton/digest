@@ -68,32 +68,23 @@ static void rho(UINT64 *A)
 			A[x + 5*y] = UINT64_ROL(A[x + 5*y], offsets[x + 5*y]);
 }
 
-static void pi(UINT64 *A)
+static void pi(UINT64 *out, const UINT64 *in)
 {
 	unsigned int x, y;
-	UINT64 tempA[25];
-
-	for (x = 0; x < 25; x++)
-		tempA[x] = A[x];
-
 	for (y = 0; y < 5; y++)
 		for (x = 0; x < 5; x++)
-			A[y + 5*((2*x + 3*y)%5)] = tempA[x + 5*y];
+			out[y + 5*((2*x + 3*y)%5)] = in[x + 5*y];
 }
 
-static void chi(UINT64 *A)
+static void chi(UINT64 *out, const UINT64 *in)
 {
-	unsigned int x, y;
-	for (y = 0; y < 5; y++) {
-		UINT64 C[5];
-		UINT64 *V = A + 5*y;
-		C[0] = UINT64_XOR(V[0], UINT64_AND(UINT64_COMP(V[1]), V[2]));
-		C[1] = UINT64_XOR(V[1], UINT64_AND(UINT64_COMP(V[2]), V[3]));
-		C[2] = UINT64_XOR(V[2], UINT64_AND(UINT64_COMP(V[3]), V[4]));
-		C[3] = UINT64_XOR(V[3], UINT64_AND(UINT64_COMP(V[4]), V[0]));
-		C[4] = UINT64_XOR(V[4], UINT64_AND(UINT64_COMP(V[0]), V[1]));
-		for (x = 0; x < 5; x++)
-			V[x] = C[x];
+	unsigned int y;
+	for (y = 0; y < 5; y++, in+=5, out+=5) {
+		out[0] = UINT64_XOR(in[0], UINT64_AND(UINT64_COMP(in[1]), in[2]));
+		out[1] = UINT64_XOR(in[1], UINT64_AND(UINT64_COMP(in[2]), in[3]));
+		out[2] = UINT64_XOR(in[2], UINT64_AND(UINT64_COMP(in[3]), in[4]));
+		out[3] = UINT64_XOR(in[3], UINT64_AND(UINT64_COMP(in[4]), in[0]));
+		out[4] = UINT64_XOR(in[4], UINT64_AND(UINT64_COMP(in[0]), in[1]));
 	}
 }
 
@@ -145,8 +136,8 @@ static void sha3_absorb(UINT64 *state, const unsigned char *data, size_t size)
 	for (i = 0; i < 24; i++) {
 		theta(state);
 		rho(state);
-		pi(state);
-		chi(state);
+		pi(buf, state);
+		chi(state, buf);
 		iota(state, i);
 	}
 }
