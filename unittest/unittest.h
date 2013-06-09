@@ -27,6 +27,41 @@
 #ifndef UNITTEST_H_
 #define UNITTEST_H_
 
+/* Using this API:
+ *
+ * Your unit test application should build unittest_main.c which implements
+ * main(). The frontend will search for a unittest symbol named "root"
+ * which you should create for your application. The descriptive name of this
+ * object does not need to be root (i.e. the name member of the unittest
+ * structure) - just the exported symbol.
+ *
+ * Unit tests are stored as a tree where each test may contain optional sub-
+ * tests. The unittest structure contains the following members:
+ *   name            - A short name for your unit test. This will be printed
+ *                     to stdout when your test executes.
+ *   description     - A description that describes what this unit test is
+ *                     actually doing.
+ *   run_fn          - A pointer to a unittest_fn to execute. This is what
+ *                     will actually contain your unit test code. If this
+ *                     member is NULL, test will be executed. It is useful if
+ *                     the subtests member is non-NULL.
+ *   run_fn_argument - A pointer to anything or nothing. It will be supplied
+ *                     to the run_fn when the test is executed.
+ *   subtests        - A NULL-terminated list of other unittest structures
+ *                     which should be run as children of this unit test. This
+ *                     field can be NULL to signify that the test has no sub-
+ *                     tests.
+ *
+ * The unittest_fn execution functions take a pointer to a unittest_manager
+ * and a void pointer as specified by the unittest's run_fn_argument. The
+ * unittest_manager is how you inform the test harness of a failure. At
+ * present there is only one available call: unittest_fail() which informs
+ * the test harness the test failed. This function takes printf style
+ * arguments to give a description of the failure.
+ *
+ * If the unittest_fn does not call unittest_fail(), the test is assumed to
+ * have passed. */
+
 struct unittest_manager;
 
 typedef void (*unittest_fn)(struct unittest_manager *manager, const void *parameter);
@@ -42,3 +77,4 @@ struct unittest {
 void unittest_fail(struct unittest_manager *manager, const char *format, ...);
 
 #endif /* UNITTEST_H_ */
+
