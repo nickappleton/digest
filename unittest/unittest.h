@@ -39,26 +39,6 @@ struct unittest {
 	const struct unittest **subtests;
 };
 
-#define TEST_DECLARE(name) \
-	struct unittest unittest_ ## name
-
-#define TEST_DECLARE_SET(name) \
-	struct unittest unittest_ ## name ## _set
-
-#define TEST_BEGIN_SET(name, description) \
-	static struct unittest **unittest_ ## name ## _tests; \
-	struct unittest unittest_ ## name ## _set = \
-	{	#name \
-	,	description \
-	,	NULL \
-	,	unittest unittest_ ## name ## _tests \
-	}; \
-	static struct unittest unittest_ ## name ## _tests[] = { \
-
-#define TEST_END_SET() \
-		NULL \
-	};
-
 void unittest_fail(struct unittest_manager *manager, const char *format, ...);
 
 #endif /* UNITTEST_H_ */
