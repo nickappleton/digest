@@ -64,7 +64,7 @@ typedef unsigned long   mccl_uif64;
 #if !defined(UIF64_MAX) && __SIZEOF_LONG_LONG__ && defined(__UINT64_MAX__)
 __extension__ typedef unsigned long long mccl_uif64;
 #define UIF64_MAX       __UINT64_MAX__
-#define UIF32_SIZE      __SIZEOF_LONG_LONG__
+#define UIF64_SIZE      __SIZEOF_LONG_LONG__
 #endif
 
 #endif /* __GNUC__ */
