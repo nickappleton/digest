@@ -128,7 +128,6 @@ static void sha3_begin(struct hash_s *hash)
 	struct hash_pvt_s *ctx = hash->state;
 	ctx->buffer_index = 0;
 	memset(ctx->state, 0, sizeof(ctx->state));
-	memset(ctx->buffer_data, 0, sizeof(ctx->buffer_data));
 }
 
 static void sha3_absorb(UINT64 *state, const unsigned char *data, size_t size)
@@ -242,9 +241,6 @@ int sha3_create(struct hash_s *hash, unsigned digest_bits)
 
 	ctx->buffer_length     = (800u - digest_bits) / 4u;
 	ctx->digest_bits       = digest_bits;
-	ctx->buffer_index      = 0;
-	memset(ctx->state, 0, sizeof(ctx->state));
-	memset(ctx->buffer_data, 0, sizeof(ctx->buffer_data));
 
 	hash->state = ctx;
 	hash->begin = sha3_begin;
