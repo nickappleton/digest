@@ -53,8 +53,8 @@ static const mccl_uif32 sha256_table[64] =
 #define MAJ(x, y, z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 #define BSIG0(x)     (ROR32(x, 2) ^  ROR32(x, 13) ^ ROR32(x, 22))
 #define BSIG1(x)     (ROR32(x, 6) ^  ROR32(x, 11) ^ ROR32(x, 25))
-#define SSIG0(x)     (ROR32(x, 7) ^  ROR32(x, 18) ^ ((x) >> 3))
-#define SSIG1(x)     (ROR32(x, 17) ^ ROR32(x, 19) ^ ((x) >> 10))
+#define SSIG0(x)     (ROR32(x, 7) ^  ROR32(x, 18) ^ (((x) & 0xFFFFFFFFu) >> 3))
+#define SSIG1(x)     (ROR32(x, 17) ^ ROR32(x, 19) ^ (((x) & 0xFFFFFFFFu) >> 10))
 
 void sha2_256_process_block(mccl_uif32 *state, const unsigned char *words)
 {
