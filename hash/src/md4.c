@@ -37,7 +37,7 @@
 #define G(x, y, z) (((x) & (y)) | ((x) & (z)) | ((y) & (z)))
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 
-static const mccl_uif32 md4_rc[4][4] =
+static const mccl_uif32 md4_rc[3][4] =
 	{	{3, 7, 11, 19}
 	,	{3, 5,  9, 13}
 	,	{3, 9, 11, 15}
