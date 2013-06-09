@@ -117,9 +117,8 @@ static void iota(UINT64 *A, unsigned round)
 
 struct hash_pvt_s {
 	unsigned      buffer_index;
-	unsigned      buffer_length; /* == rate / 8 */
-	unsigned      digest_bits; /* was fixedOutputLength */
-	unsigned int  capacity;
+	unsigned      buffer_length;
+	unsigned      digest_bits;
 	unsigned char buffer_data[192];
 	UINT64        state[25];
 } spongeState;
@@ -241,8 +240,7 @@ int sha3_create(struct hash_s *hash, unsigned digest_bits)
 	if (!ctx)
 		return -1;
 
-	ctx->capacity          = 2 * digest_bits;
-	ctx->buffer_length     = (1600u - ctx->capacity) / 8u;
+	ctx->buffer_length     = (800u - digest_bits) / 4u;
 	ctx->digest_bits       = digest_bits;
 	ctx->buffer_index      = 0;
 	memset(ctx->state, 0, sizeof(ctx->state));
