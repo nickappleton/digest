@@ -44,6 +44,23 @@
 
 #include <limits.h>
 
+/* If this macro is set, prefer types with known sizes (in preference to fast
+ * types with unknown sizes). This may be advantageous when converting buffers
+ * of the types. */
+#if 1
+#  define PREFER_KNOWN_SIZE_TYPES (1)
+#endif
+
+/* Preprocessor-time bit counting thing. */
+#define NUMBITS_2(x)   (((x) & 0x2u) ? 2u : 1u)                                                /* x 1..2 bits */
+#define NUMBITS_4(x)   (((x) & 0xCu) ? (2u + NUMBITS_2((x) >> 2u)) : NUMBITS_2(x))             /* x 1..4 bits */
+#define NUMBITS_8(x)   (((x) & 0xF0u) ? (4u + NUMBITS_4((x) >> 4u)) : NUMBITS_4(x))            /* x 1..8 bits */
+#define NUMBITS_16(x)  (((x) & 0xFF00u) ? (8u + NUMBITS_8((x) >> 8u)) : NUMBITS_8(x))          /* x 1..16 bits */
+#define NUMBITS_32(x)  (((x) & 0xFFFF0000u) ? (16u + NUMBITS_16((x) >> 16u)) : NUMBITS_16(x))  /* x 1..32 bits */
+#define NUMBITS_64B(x) (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_32((x) >> 32u)) : NUMBITS_32(x))  /* x 1..64 bits */
+#define NUMBITS_64A(x) (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_64B((x) >> 32u)) : NUMBITS_32(x)) /* x 1..96 bits */
+#define NUMBITS(x)     (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_64A((x) >> 32u)) : NUMBITS_32(x)) /* x 1..128 bits */
+
 #if __GNUC__
 
 /* LP64 on GNUC means that longs are 64 bit and ints are 32 bit. */
@@ -69,19 +86,40 @@ __extension__ typedef unsigned long long mccl_uif64;
 
 #endif /* __GNUC__ */
 
+/* If we didn't define our types, fall back on the c99 types. */
 #if defined(__STDC__) && (__STDC_VERSION__ >= 199901L) && (!defined(UIF32_MAX) || !defined(UIF64_MAX))
 
 #include <stdint.h>
 
 #if !defined(UIF32_MAX)
+#if defined(UINT32_MAX) && PREFER_KNOWN_SIZE_TYPES
+#if (NUMBITS(UINT32_MAX) != 32) || (NUMBITS(UINT32_MAX) % CHAR_BIT != 0)
+#error sanity check failed - either your compiler is broken or I made some bad assumptions
+#endif
+typedef uint32_t        mccl_uif32;
+#define UIF32_MAX       UINT32_MAX
+#define UIF32_SIZE      (NUMBITS(UIF32_MAX) / CHAR_BIT)
+#define UIF32_UNPADDED  (1)
+#else
 typedef uint_fast32_t   mccl_uif32;
 #define UIF32_MAX       UINT_FAST32_MAX
 #endif
+#endif /* !defined(UIF32_MAX) */
 
 #if !defined(UIF64_MAX)
+#if defined(UINT64_MAX) && PREFER_KNOWN_SIZE_TYPES
+#if (NUMBITS(UINT64_MAX) != 64) || (NUMBITS(UINT64_MAX) % CHAR_BIT != 0)
+#error sanity check failed - either your compiler is broken or I made some bad assumptions
+#endif
+typedef uint64_t        mccl_uif64;
+#define UIF64_MAX       UINT64_MAX
+#define UIF64_SIZE      (NUMBITS(UIF64_MAX) / CHAR_BIT)
+#define UIF64_UNPADDED  (1)
+#else
 typedef uint_fast64_t   mccl_uif64;
 #define UIF64_MAX       UINT_FAST64_MAX
 #endif
+#endif /* !defined(UIF64_MAX) */
 
 #endif /* C99 */
 
@@ -91,4 +129,23 @@ typedef unsigned long   mccl_uif32;
 #define UIF32_MAX       ULONG_MAX
 #endif
 
+/* Say how many bits our types have */
+#if !defined(UIF32_NUMBITS)
+#define UIF32_NUMBITS  NUMBITS(UIF32_MAX)
+#endif
+#if defined(UIF64_MAX) && !defined(UIF64_NUMBITS)
+#define UIF64_NUMBITS  NUMBITS(UIF64_MAX)
+#endif
+
+/* If we know the exact size of the type and we know it's maximum value, we
+ * can probe to figure out if the native type contains any padding. Hack at
+ * your own peril. */
+#if !defined(UIF32_UNPADDED) && defined(UIF32_MAX) && defined(UIF32_SIZE) && (UIF32_NUMBITS == CHAR_BIT * UIF32_SIZE)
+#define UIF32_UNPADDED (1)
+#endif
+#if !defined(UIF64_UNPADDED) && defined(UIF64_MAX) && defined(UIF64_SIZE) && (UIF64_NUMBITS == CHAR_BIT * UIF64_SIZE)
+#define UIF64_UNPADDED (1)
+#endif
+
 #endif /* FASTINTS_H_ */
+

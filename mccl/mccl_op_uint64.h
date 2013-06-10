@@ -50,6 +50,10 @@
 #if UIF32_SIZE
 #define UIA64_SIZE (2 * UIF32_SIZE)
 #endif
+#if UIF32_UNPADDED
+#define UIA64_UNPADDED (1)
+#endif
+#define UIA64_NUMBITS (2 * UIF32_NUMBITS)
 
 typedef struct {
 	mccl_uif32 data[2];
@@ -138,6 +142,10 @@ static INLINE UINT64 mulu64x16(UINT64 a, unsigned b)
 #if UIF64_SIZE
 #define UIA64_SIZE UIF64_SIZE
 #endif
+#if UIF64_UNPADDED
+#define UIA64_UNPADDED (1)
+#endif
+#define UIA64_NUMBITS UIF64_NUMBITS
 
 typedef struct { mccl_uif64 val; } UINT64;
 
@@ -173,6 +181,10 @@ static INLINE UINT64 makeu64(mccl_uif64 val)
 #if UIF64_SIZE
 #define UIA64_SIZE UIF64_SIZE
 #endif
+#if UIF64_UNPADDED
+#define UIA64_UNPADDED (1)
+#endif
+#define UIA64_NUMBITS UIF64_NUMBITS
 
 typedef mccl_uif64 UINT64;
 

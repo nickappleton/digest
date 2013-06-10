@@ -51,7 +51,7 @@
 
 static INLINE void bufcvt_le32_to_uif32(mccl_uif32 *ele, const unsigned char *data, unsigned nb_elements)
 {
-#if defined(UIF32_SIZE) && (UIF32_SIZE == 4) && MCCL_ENDIAN_LITTLE && !MCCL_BUFCVT_SAFE
+#if (CHAR_BIT == 8) && (UIF32_NUMBITS == 32) && UIF32_UNPADDED && MCCL_ENDIAN_LITTLE && !MCCL_BUFCVT_SAFE
 	memcpy(ele, data, 4 * nb_elements);
 #else
 	unsigned i;
@@ -66,7 +66,7 @@ static INLINE void bufcvt_le32_to_uif32(mccl_uif32 *ele, const unsigned char *da
 
 static INLINE void bufcvt_be32_to_uif32(mccl_uif32 *ele, const unsigned char *data, unsigned nb_elements)
 {
-#if defined(UIF32_SIZE) && (UIF32_SIZE == 4) && MCCL_ENDIAN_BIG && !MCCL_BUFCVT_SAFE
+#if (CHAR_BIT == 8) && (UIF32_NUMBITS == 32) && UIF32_UNPADDED && MCCL_ENDIAN_BIG && !MCCL_BUFCVT_SAFE
 	memcpy(ele, data, 4 * nb_elements);
 #else
 	unsigned i;
@@ -81,7 +81,7 @@ static INLINE void bufcvt_be32_to_uif32(mccl_uif32 *ele, const unsigned char *da
 
 static INLINE void bufcvt_le64_to_UINT64(UINT64 *ele, const unsigned char *data, unsigned nb_elements)
 {
-#if defined(UIA64_SIZE) && (UIA64_SIZE == 8) && MCCL_ENDIAN_LITTLE && !MCCL_BUFCVT_SAFE
+#if (CHAR_BIT == 8) && (UIA64_NUMBITS == 64) && UIA64_UNPADDED && MCCL_ENDIAN_LITTLE && !MCCL_BUFCVT_SAFE
 	memcpy(ele, data, 8 * nb_elements);
 #else
 	unsigned i;
@@ -102,7 +102,7 @@ static INLINE void bufcvt_le64_to_UINT64(UINT64 *ele, const unsigned char *data,
 
 static INLINE void bufcvt_be64_to_UINT64(UINT64 *ele, const unsigned char *data, unsigned nb_elements)
 {
-#if defined(UIA64_SIZE) && (UIA64_SIZE == 8) && MCCL_ENDIAN_BIG && !MCCL_BUFCVT_SAFE
+#if (CHAR_BIT == 8) && (UIA64_NUMBITS == 64) && UIA64_UNPADDED && MCCL_ENDIAN_BIG && !MCCL_BUFCVT_SAFE
 	memcpy(ele, data, 8 * nb_elements);
 #else
 	unsigned i;
