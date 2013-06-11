@@ -50,7 +50,7 @@ static const mccl_uif32 md5_k[64] =
 	,0xF7537E82u, 0xBD3AF235u, 0x2AD7D2BBu, 0xEB86D391u
 	};
 
-static const mccl_uif32 r[4][8] =
+static const unsigned r[4][8] =
 	{	{7, 12, 17, 22, 7, 12, 17, 22}
 	,	{5,  9, 14, 20, 5,  9, 14, 20}
 	,	{4, 11, 16, 23, 4, 11, 16, 23}
@@ -119,7 +119,7 @@ static void md5_process_buffer(const unsigned char *data, mccl_uif32 *state)
 }
 
 struct hash_pvt_s {
-	mccl_uif32   h[4];
+	mccl_uif32    h[4];
 	UINT64        length;
 	unsigned      buffer_index;
 	unsigned char buffer_data[64];
