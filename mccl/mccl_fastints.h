@@ -27,19 +27,29 @@
 #ifndef MCCL_FASTINTS_H_
 #define MCCL_FASTINTS_H_
 
-/* Supplies the following type:
- *   mccl_uif32 - fast minimum 32-bit width unsigned integer
- *   UIF32_MAX  - the maximum value the mccl_uif32 type can hold
- *   UIF32_SIZE - the size in chars of the mccl_uif32 type
+/* Always supplies the following type:
+ *   mccl_uif32     - fast minimum 32-bit width unsigned integer
  * May supply the following type:
- *   mccl_uif64 - fast minimum 64-bit width unsigned integer
- *   UIF32_MAX  - the maximum value the mccl_uif32 type can hold
- *   UIF32_SIZE - the size in chars of the mccl_uif32 type
+ *   mccl_uif64     - fast minimum 64-bit width unsigned integer
+ * Always supplies the following macros:
+ *   UIF32_MAX      - the maximum value the mccl_uif32 type can hold
+ *   UIF32_NUMBITS  - the number of valid bits in the minimum 32-bit type
+ * May supply the following macros:
+ *   UIF32_SIZE     - the size in chars of the mccl_uif32 type
+ *   UIF32_UNPADDED - this macro is set if (and only if) it is known that the
+ *                    mccl_uif32 type contains no padding bits.
+ *   UIF64_MAX      - the maximum value the mccl_uif64 type can hold
+ *   UIF64_NUMBITS  - the actual number of bits in the minimum 64-bit type
+ *   UIF64_SIZE     - the size in chars of the mccl_uif64 type
+ *   UIF64_UNPADDED - this macro is set if (and only if) it is known that the
+ *                    mccl_uif64 type contains no padding bits.
  *
- * The UIFx_SIZE macros may not be defined if the size is not known.
- * The UIFx_MAX macros will always be defined if the type is defined (i.e.
- * the presence of the type can be determined by the existance of this
- * macro).
+ * The UIFx_SIZE macros may not be defined if the exact size of the type is
+ * unknown at preprocessor time.
+ *
+ * The UIFx_MAX and UIFx_NUMBITS macros will always be defined if the type is
+ * defined (i.e. the presence of these types can be determined by the
+ * existance of these macros).
  */
 
 #include <limits.h>
