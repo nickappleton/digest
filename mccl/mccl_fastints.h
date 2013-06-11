@@ -57,9 +57,9 @@
 #define NUMBITS_8(x)   (((x) & 0xF0u) ? (4u + NUMBITS_4((x) >> 4u)) : NUMBITS_4(x))            /* x 1..8 bits */
 #define NUMBITS_16(x)  (((x) & 0xFF00u) ? (8u + NUMBITS_8((x) >> 8u)) : NUMBITS_8(x))          /* x 1..16 bits */
 #define NUMBITS_32(x)  (((x) & 0xFFFF0000u) ? (16u + NUMBITS_16((x) >> 16u)) : NUMBITS_16(x))  /* x 1..32 bits */
-#define NUMBITS_64B(x) (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_32((x) >> 32u)) : NUMBITS_32(x))  /* x 1..64 bits */
-#define NUMBITS_64A(x) (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_64B((x) >> 32u)) : NUMBITS_32(x)) /* x 1..96 bits */
-#define NUMBITS(x)     (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_64A((x) >> 32u)) : NUMBITS_32(x)) /* x 1..128 bits */
+#define NUMBITS_64(x)  (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_32((x) >> 32u)) : NUMBITS_32(x))  /* x 1..64 bits */
+#define NUMBITS_96(x)  (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_64((x) >> 32u)) : NUMBITS_32(x))  /* x 1..96 bits */
+#define NUMBITS(x)     (((x) > 0xFFFFFFFFu) ? (32u + NUMBITS_96((x) >> 32u)) : NUMBITS_32(x))  /* x 1..128 bits */
 
 #if __GNUC__
 
