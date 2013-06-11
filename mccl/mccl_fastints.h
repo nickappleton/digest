@@ -125,8 +125,15 @@ typedef uint_fast64_t   mccl_uif64;
 
 /* Fallback on long for 32 bit type if still not-existant */
 #if !defined(UIF32_MAX)
+/* This seems completely reasonable to prefer the integer type over the long
+ * integer type. Flame me if I am wrong. */
+#if NUMBITS(UINT_MAX) >= 32
+typedef unsigned        mccl_uif32;
+#define UIF32_MAX       UINT_MAX
+#else
 typedef unsigned long   mccl_uif32;
 #define UIF32_MAX       ULONG_MAX
+#endif
 #endif
 
 /* Say how many bits our types have */
