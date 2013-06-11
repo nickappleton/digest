@@ -70,17 +70,59 @@ typedef struct {
 #endif
 
 #define UINT64_MAKE(high, low) makeu64(high, low)
-#define UINT64_XOR(a, b)       makeu64(UINT64_H(a) ^ UINT64_H(b), UINT64_L(a) ^ UINT64_L(b))
-#define UINT64_OR(a, b)        makeu64(UINT64_H(a) | UINT64_H(b), UINT64_L(a) | UINT64_L(b))
-#define UINT64_AND(a, b)       makeu64(UINT64_H(a) & UINT64_H(b), UINT64_L(a) & UINT64_L(b))
-#define UINT64_COMP(a)         makeu64(~UINT64_H(a), ~UINT64_L(a))
+#define UINT64_XOR(a, b)       xoru64(a, b)
+#define UINT64_OR(a, b)        oru64(a, b)
+#define UINT64_AND(a, b)       andu64(a, b)
+#define UINT64_COMP(a)         compu64(a)
 #define UINT64_ADD(a, b)       addu64(a, b)
 #define UINT64_SUB(a, b)       addu64(a, twos64(b))
 #define UINT64_SHL(a, b)       shlu64(a, b)
 #define UINT64_SHR(a, b)       shru64(a, b)
 #define UINT64_MUL64x16(a, b)  mulu64x16(a, b)
-#define UINT64_LOW(a)          UINT64_L(a)
-#define UINT64_HIGH(a)         UINT64_H(a)
+#define UINT64_LOW(a)          getlowu64(a)
+#define UINT64_HIGH(a)         gethighu64(a)
+
+static INLINE mccl_uif32 getlowu64(UINT64 a)
+{
+	return UINT64_L(a);
+}
+
+static INLINE mccl_uif32 gethighu64(UINT64 a)
+{
+	return UINT64_H(a);
+}
+
+static INLINE UINT64 oru64(UINT64 a, UINT64 b)
+{
+	UINT64 ret;
+	UINT64_H(ret) = UINT64_H(a) | UINT64_H(b);
+	UINT64_L(ret) = UINT64_L(a) | UINT64_L(b);
+	return ret;
+}
+
+static INLINE UINT64 xoru64(UINT64 a, UINT64 b)
+{
+	UINT64 ret;
+	UINT64_H(ret) = UINT64_H(a) ^ UINT64_H(b);
+	UINT64_L(ret) = UINT64_L(a) ^ UINT64_L(b);
+	return ret;
+}
+
+static INLINE UINT64 andu64(UINT64 a, UINT64 b)
+{
+	UINT64 ret;
+	UINT64_H(ret) = UINT64_H(a) & UINT64_H(b);
+	UINT64_L(ret) = UINT64_L(a) & UINT64_L(b);
+	return ret;
+}
+
+static INLINE UINT64 compu64(UINT64 a)
+{
+	UINT64 ret;
+	UINT64_H(ret) = ~UINT64_H(a);
+	UINT64_L(ret) = ~UINT64_L(a);
+	return ret;
+}
 
 static INLINE UINT64 makeu64(mccl_uif32 high, mccl_uif32 low)
 {
