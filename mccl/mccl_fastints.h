@@ -123,7 +123,7 @@ typedef uint_fast64_t   mccl_uif64;
 
 #endif /* C99 */
 
-/* Fallback on long for 32 bit type if still not-existant */
+/* Fallback search for 32-bit type of unknown size */
 #if !defined(UIF32_MAX)
 /* This seems completely reasonable to prefer the integer type over the long
  * integer type. Flame me if I am wrong. */
@@ -133,6 +133,17 @@ typedef unsigned        mccl_uif32;
 #else
 typedef unsigned long   mccl_uif32;
 #define UIF32_MAX       ULONG_MAX
+#endif
+#endif
+
+/* Fallback search for 64-bit type of unknown size (still may not exist) */
+#if !defined(UIF64_MAX)
+#if NUMBITS(UINT_MAX) >= 64
+typedef unsigned        mccl_uif64;
+#define UIF64_MAX       UINT_MAX
+#elif NUMBITS(ULONG_MAX) >= 64
+typedef unsigned long   mccl_uif64;
+#define UIF64_MAX       ULONG_MAX
 #endif
 #endif
 
