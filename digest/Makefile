@@ -13,7 +13,9 @@ SRCS     = \
 ../hash/src/tiger.c \
 ../hash/src/hashtree.c \
 ../hash/src/md4.c \
-../hash/src/md5.c
+../hash/src/md5.c \
+../hash/src/whirlpool_coefs.c \
+../hash/src/whirlpool.c
 
 ifeq (${MAKECMDGOALS},check)
 TARGET := unittest
@@ -28,7 +30,8 @@ SRCS += \
 ../hash/tests/sha2_test.c \
 ../hash/tests/sha3_test.c \
 ../hash/tests/tiger_test.c \
-../hash/tests/tigertree_test.c
+../hash/tests/tigertree_test.c \
+../hash/tests/whirlpool_test.c
 else
 TARGET := digest
 SRCS += ./src/digest.c

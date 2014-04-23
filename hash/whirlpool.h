@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, Nicholas Appleton (http://www.appletonaudio.com)
+/* Copyright (c) 2014, Nicholas Appleton (http://www.appletonaudio.com)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,36 +24,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE. */
 
-#include "hash/hash_tests.h"
-#include <stdio.h>
+#ifndef WHIRLPOOL_H
+#define WHIRLPOOL_H
 
-extern const struct unittest sha1_tests;
-extern const struct unittest sha2_tests;
-extern const struct unittest sha3_tests;
-extern const struct unittest tiger_tests;
-extern const struct unittest tigertree_tests;
-extern const struct unittest md4_tests;
-extern const struct unittest md5_tests;
-extern const struct unittest whirlpool_tests;
+#include "hash.h"
 
-const struct unittest *sub_tests[] =
-{	&md4_tests
-,	&md5_tests
-,	&sha1_tests
-,	&sha2_tests
-,	&sha3_tests
-,	&tiger_tests
-,	&tigertree_tests
-,   &whirlpool_tests
-,	NULL
-};
+int whirlpool_create(struct hash_s *hash);
 
-const struct unittest hash_tests =
-{	"hash"
-,	"Hash test set"
-,	NULL
-,	NULL
-,	sub_tests
-};
-
-
+#endif /* WHIRLPOOL_H */

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Nicholas Appleton (http://www.appletonaudio.com)
+/* Copyright (c) 2013-2014, Nicholas Appleton (http://www.appletonaudio.com)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@
 #include "hash/sha3.h"
 #include "hash/md4.h"
 #include "hash/md5.h"
+#include "hash/whirlpool.h"
 #include "hash/hashtree.h"
 
 /* File reading buffer size */
@@ -279,6 +280,21 @@ md4_setup(struct hash_step *step, const char *cfg_str)
 	return 0;
 }
 
+static
+int
+whirlpool_setup(struct hash_step *step, const char *cfg_str)
+{
+	if (cfg_str) {
+		fprintf(stderr, "cannot configure whirlpool with '%s'\n", cfg_str);
+		return -1;
+	}
+	if (whirlpool_create(&step->hash)) {
+		fprintf(stderr, "could not create whirlpool hash object\n");
+		return -2;
+	}
+	return 0;
+}
+
 typedef int (*hash_cfg_func)(struct hash_step *step, const char *cfg_str);
 
 struct hash_alg {
@@ -315,6 +331,7 @@ static const struct hash_alg supported[] =
 ,	{"sha3", sha3_setup, generic_hash_help}
 ,	{"md4", md4_setup, generic_hash_help}
 ,	{"md5", md5_setup, generic_hash_help}
+,	{"whirlpool", whirlpool_setup, generic_hash_help}
 };
 
 /* Searches the given string until the next separator ('.' or ':') or the end
