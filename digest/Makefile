@@ -38,7 +38,7 @@ SRCS += ./src/digest.c
 endif
 
 # Compiler flags
-CCFLAGS = \
+CCFLAGS += \
 -Wall \
 -Wdouble-promotion \
 -Wno-unused-function \
