@@ -637,8 +637,6 @@ main(int argc, char *argv[])
 		i++;
 	}
 
-	assert(steps);
-
 	if ((steps != NULL) && !error) {
 		if (filename) {
 			error = open_and_process(filename, steps);
@@ -650,7 +648,7 @@ main(int argc, char *argv[])
 	if (!error)
 		error = steps_finish_and_print(steps);
 
-	while (steps)
+	while (steps != NULL)
 		step_unlink(&steps);
 
 	exit(error);
