@@ -30,6 +30,41 @@
 #include <assert.h>
 #include <stdlib.h>
 
+static void whirlpool_round(UINT64 *state, UINT64 *k, UINT64 salt)
+{
+	UINT64 l[8];
+	unsigned i;
+
+	for (i = 0; i < 8; i++)
+	{
+		unsigned t;
+		l[i] = UINT64_MAKE(0, 0);
+		for (t = 0; t < 8; t++)
+			l[i] =
+				UINT64_XOR
+					(l[i]
+					,whirlpool_sboxes[t][UINT64_LOW(UINT64_SHR(k[(i - t) & 7], 56 - t * 8)) & 0xFFu]
+					);
+	}
+
+	l[0] = k[0] = UINT64_XOR(l[0], salt);
+	for (i = 1; i < 8; i++)
+		k[i] = l[i];
+
+	for (i = 0; i < 8; i++) {
+		unsigned t;
+		for (t = 0; t < 8; t++)
+			l[i] =
+				UINT64_XOR
+					(l[i]
+					,whirlpool_sboxes[t][UINT64_LOW(UINT64_SHR(state[(i - t) & 7], 56 - t * 8)) & 0xFFu]
+					);
+	}
+
+	for (i = 0; i < 8; i++)
+		state[i] = l[i];
+}
+
 static void whirlpool_process_buffer(const unsigned char *buffer, UINT64 *hash)
 {
 	UINT64 block[8];
@@ -45,41 +80,8 @@ static void whirlpool_process_buffer(const unsigned char *buffer, UINT64 *hash)
 		state[i] = UINT64_XOR(block[i], hash[i]);
 	}
 
-	for (r = 0; r < WHIRLPOOL_NB_ROUNDS; r++) {
-		UINT64 l[8];
-
-		for (i = 0; i < 8; i++) {
-			unsigned t;
-			unsigned s;
-			l[i] = UINT64_MAKE(0, 0);
-			for (t = 0, s = 56; t < 8; t++, s -= 8)
-				l[i] =
-					UINT64_XOR
-						(l[i]
-						,whirlpool_sboxes[t][UINT64_LOW(UINT64_SHR(k[(i - t) & 7], s)) & 0xFFu]
-						);
-		}
-
-		for (i = 0; i < 8; i++)
-			k[i] = l[i];
-
-		k[0] = UINT64_XOR(k[0], whirlpool_rounds[r]);
-
-		for (i = 0; i < 8; i++) {
-			unsigned t;
-			unsigned s;
-			l[i] = k[i];
-			for (t = 0, s = 56; t < 8; t++, s -= 8)
-				l[i] =
-					UINT64_XOR
-						(l[i]
-						,whirlpool_sboxes[t][UINT64_LOW(UINT64_SHR(state[(i - t) & 7], s)) & 0xFFu]
-						);
-		}
-
-		for (i = 0; i < 8; i++)
-			state[i] = l[i];
-	}
+	for (r = 0; r < WHIRLPOOL_NB_ROUNDS; r++)
+		whirlpool_round(state, k, whirlpool_rounds[r]);
 
 	for (i = 0; i < 8; i++)
 		hash[i] = UINT64_XOR(hash[i], UINT64_XOR(state[i], block[i]));
