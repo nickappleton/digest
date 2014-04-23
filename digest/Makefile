@@ -1,8 +1,8 @@
 # Name of your target
-DEBUG        := 0
+DEBUG ?= 0
 
 # Source filenames
-SRCS     = \
+SRCS := \
 ../hash/src/sha1.c \
 ../hash/src/sha2.c \
 ../hash/src/sha2_256.c \
@@ -40,7 +40,6 @@ endif
 # Compiler flags
 CCFLAGS += \
 -Wall \
--Wdouble-promotion \
 -Wno-unused-function \
 -msse3 \
 -std=gnu99 \
@@ -48,11 +47,12 @@ CCFLAGS += \
 -pedantic \
 -D_BSD_SOURCE \
 -I..
+# -Wdouble-promotion
 
-LDFLAGS =
-LIBS    =
-CC      = gcc
-CXX     = g++
+LDFLAGS  ?=
+LIBS     ?=
+CC       ?= gcc
+CXX      ?= g++
 
 ifneq ($(DEBUG),0)
 CCFLAGS  += -O0 -ggdb3 -ftrapv
