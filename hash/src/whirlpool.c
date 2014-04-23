@@ -97,6 +97,7 @@ static void whirlpool_begin(struct hash_s *hash)
 {
 	unsigned i;
 	hash->state->buffer_index = 0;
+	hash->state->length = UINT64_MAKE(0, 0);
 	for (i = 0; i < 8; i++)
 		hash->state->h[i] = UINT64_MAKE(0, 0);
 }

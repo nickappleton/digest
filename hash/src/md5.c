@@ -128,6 +128,7 @@ struct hash_pvt_s {
 static void md5_begin(struct hash_s *hash)
 {
 	hash->state->buffer_index = 0;
+	hash->state->length = UINT64_MAKE(0, 0);
 	hash->state->h[0] = 0x67452301u;
 	hash->state->h[1] = 0xEFCDAB89u;
 	hash->state->h[2] = 0x98BADCFEu;
